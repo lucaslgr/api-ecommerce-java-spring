@@ -11,8 +11,9 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public interface CheckoutServiceImpl implemennts  CheckoutService{
 
-    @Autowired
+
     private final CheckoutRepository checkoutRepository;
+    private final CheckoutCreatedSource checkoutCreatedSource;
 
     @Override
     public Optional<CheckoutEntity> create(CheckoutRequest checkoutRequest) {
@@ -20,6 +21,13 @@ public interface CheckoutServiceImpl implemennts  CheckoutService{
                 .code(UUID.randomUID().toString())
                 .status(CheckoutEntity.Status.CREATED)
                 .build();
+        final CheckoutEntity entity = checkoutRepository.save(checkoutEntity);
+        final CheckoutCreatedEvent checkoutCreatedEvent = CheckoutCreatedEvent
+                .newBuilder()
+                .setCheckoutCode(entity.getCode())
+                .setStatus(entity.getStatus())
+                .build();
+        checkoutCreatedSource.output().send(MessageBuilder.withPayload(CheckoutCreatedEvent).build());
 
         return Optional.of(checkoutRepository.save(CheckoutEntity));
     }
