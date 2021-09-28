@@ -25,7 +25,7 @@ public interface CheckoutServiceImpl implemennts  CheckoutService{
         final CheckoutCreatedEvent checkoutCreatedEvent = CheckoutCreatedEvent
                 .newBuilder()
                 .setCheckoutCode(entity.getCode())
-                .setStatus(entity.getStatus())
+                .setStatus(entity.getStatus().name())
                 .build();
         checkoutCreatedSource.output().send(MessageBuilder.withPayload(CheckoutCreatedEvent).build());
 
